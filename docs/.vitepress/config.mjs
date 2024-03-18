@@ -6,7 +6,7 @@ export default defineConfig({
   description: "My Site",
 
   lastUpdated: true,
-  cleanUrls: true,
+  cleanUrls: false,
   metaChunk: true,
 
   markdown: {
@@ -102,6 +102,7 @@ function sideberRust() {
       items: [
         { text: '目录', link: '/' },
         { text: '数组与指针', link: 'array-and-pointer' },
+        { text: '使用 trait 进行类型转换', link: 'use-trait-for-type-conversion' },
       ]
     }
   ]
