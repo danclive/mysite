@@ -10,6 +10,9 @@ hero:
     - theme: alt
       text: Rust 系列
       link: /rust/
+    - theme: alt
+      text: Rust For ESP 系列
+      link: https://github.com/danclive/esp-examples
 ---
 
 [[toc]]
