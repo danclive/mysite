@@ -36,7 +36,8 @@ export default defineConfig({
     ],
 
     sidebar: {
-      '/rust/': { base: '/rust/', items: sideberRust() }
+      '/rust/': { base: '/rust/', items: sideberRust() },
+      '/rust-study-note/': { base: '/rust-study-note/', items: sideberRustStudyNote() }
     },
 
     footer: {
@@ -103,6 +104,109 @@ function sideberRust() {
         { text: '目录', link: '/' },
         { text: '数组与指针', link: 'array-and-pointer' },
         { text: '使用 trait 进行类型转换', link: 'use-trait-for-type-conversion' },
+      ]
+    }
+  ]
+}
+
+function sideberRustStudyNote() {
+  return [
+    {
+      text: '前言',
+      link: '/',
+    },
+    {
+      text: '语言基础',
+      collapsed: false,
+      items: [
+        { text: '变量与常量', link: '/' },
+      ]
+    },
+    {
+      text: '标准库',
+      collapsed: false,
+      items: [
+        { text: '变量与常量', link: '/' },
+        // Vec
+        // String
+        // HashMap
+        // Box
+        // Rc
+        // Arc
+        // Cell
+        // RefCell
+        // Mutex
+        // RwLock
+        // Option
+        // Result
+        // Iterator
+        // Future
+        // Thread
+        // Channel
+        // Atomic
+        // Once
+        // Lazy
+        // Pin
+        // Slice
+        // String
+        // Vec
+        // HashMap
+        // HashSet
+        // BTreeMap
+        // BTreeSet
+        // LinkedList
+        // BinaryHeap
+      ]
+    },
+    {
+      text: '命令行',
+      collapsed: false,
+      items: [
+        { text: '变量与常量', link: '/' },
+        // clap
+        // structopt
+        // clap_derive
+        // structopt_derive
+        // log
+        // env_logger
+        // simple_logger
+        // pretty_env_logger
+      ]
+    },
+    {
+      text: '网络与多线程',
+      collapsed: false,
+      items: [
+        { text: '变量与常量', link: '/' },
+        // tcp
+        // udp
+        // epoll
+        // eventfd, timerfd
+        // mio
+        // tokio
+      ]
+    },
+    {
+      text: 'FFI',
+      collapsed: false,
+      items: [
+        { text: '变量与常量', link: '/' },
+        // cbindgen
+        // bindgen
+      ]
+    },
+    {
+      text: '嵌入式',
+      collapsed: false,
+      items: [
+        { text: '变量与常量', link: '/' },
+        // probe-rs
+        // cargo-embed
+        // cargo-flash
+        // cargo-espflash
+        // cargo-espmonitor
+        // esp32-hal
+        // rtic
       ]
     }
   ]

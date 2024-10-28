@@ -174,9 +174,9 @@ pub trait Into<T> {
     fn into(self) -> T;
 }
 
-impl<T, U> const Into<U> for T
+impl<T, U> Into<U> for T
 where
-    U: ~const From<T>,
+    U: From<T>,
 {
     fn into(self) -> U {
         U::from(self)
