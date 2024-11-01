@@ -7,9 +7,9 @@ hero:
   text: "Don't Panic"
   tagline: ......
   actions:
-    - theme: alt
-      text: Rust 系列
-      link: /rust/
+    # - theme: alt
+    #   text: Rust 系列
+    #   link: /rust/
     - theme: alt
       text: Rust 学习笔记
       link: /rust-study-note/

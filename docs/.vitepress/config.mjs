@@ -36,7 +36,7 @@ export default defineConfig({
     ],
 
     sidebar: {
-      '/rust/': { base: '/rust/', items: sideberRust() },
+      // '/rust/': { base: '/rust/', items: sideberRust() },
       '/rust-study-note/': { base: '/rust-study-note/', items: sideberRustStudyNote() }
     },
 
@@ -112,57 +112,41 @@ function sideberRust() {
 function sideberRustStudyNote() {
   return [
     {
-      text: '前言',
+      text: '目录',
       link: '/',
     },
     {
-      text: '语言基础',
+      text: '语言', // language
       collapsed: false,
       items: [
-        { text: '变量与常量', link: '/' },
-      ]
-    },
-    {
-      text: '标准库',
-      collapsed: false,
-      items: [
-        { text: '变量与常量', link: '/' },
-        // Vec
-        // String
-        // HashMap
-        // Box
-        // Rc
-        // Arc
-        // Cell
-        // RefCell
-        // Mutex
-        // RwLock
-        // Option
-        // Result
-        // Iterator
-        // Future
-        // Thread
-        // Channel
-        // Atomic
-        // Once
-        // Lazy
-        // Pin
-        // Slice
-        // String
-        // Vec
-        // HashMap
-        // HashSet
-        // BTreeMap
-        // BTreeSet
-        // LinkedList
-        // BinaryHeap
+        { text: '类型转换', link: '/language/type-conversion' },
+        // { text: '安装', link: '/language-basic/install' },
+        // { text: '基本语法', link: '/language-basic/basic-syntax' },
+        // { text: '数据类型', link: '/language-basic/data-type' },
+        // { text: '数学运算符', link: '/language-basic/math-operator' },
+        // { text: '数组、切片和Vec', link: '/language-basic/array-slice-and-vec' },
+        // { text: '字符串', link: '/language-basic/string' },
+        // { text: '函数', link: '/language-basic/function' },
+        // { text: '控制流', link: '/language-basic/control-flow' },
+        // { text: '包和模块', link: '/language-basic/package-and-module' },
+        // { text: '错误处理', link: '/language-basic/error-handling' },
+        // { text: '泛型、特性与类型', link: '/language-basic/generic-trait-and-type' },
+        // { text: '模式匹配', link: '/language-basic/pattern-matching' },
+        // { text: '闭包', link: '/language-basic/closure' },
+        // { text: '迭代器', link: '/language-basic/iterator' },
+        // { text: '并发', link: '/language-basic/concurrency' },
+        // { text: '标准库', link: '/language-basic/standard-library' },
+        // { text: '宏', link: '/language-basic/macro' },
+        // { text: '测试', link: '/language-basic/test' },
+        // { text: '包管理', link: '/language-basic/package-management' },
+        // { text: 'cargo', link: '/language-basic/cargo' },
       ]
     },
     {
       text: '命令行',
       collapsed: false,
       items: [
-        { text: '变量与常量', link: '/' },
+        // { text: '变量与常量', link: '/' },
         // clap
         // structopt
         // clap_derive
@@ -174,10 +158,10 @@ function sideberRustStudyNote() {
       ]
     },
     {
-      text: '网络与多线程',
+      text: '网络',
       collapsed: false,
       items: [
-        { text: '变量与常量', link: '/' },
+        // { text: '变量与常量', link: '/' },
         // tcp
         // udp
         // epoll
@@ -190,7 +174,7 @@ function sideberRustStudyNote() {
       text: 'FFI',
       collapsed: false,
       items: [
-        { text: '变量与常量', link: '/' },
+        // { text: '变量与常量', link: '/' },
         // cbindgen
         // bindgen
       ]
@@ -199,7 +183,7 @@ function sideberRustStudyNote() {
       text: '嵌入式',
       collapsed: false,
       items: [
-        { text: '变量与常量', link: '/' },
+        // { text: '变量与常量', link: '/' },
         // probe-rs
         // cargo-embed
         // cargo-flash
