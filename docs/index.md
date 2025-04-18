@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: "哈VoV哈"
+  name: "MAIN.RUN"
   text: "Don't Panic"
   tagline: ......
   actions:
@@ -11,8 +11,8 @@ hero:
     #   text: Rust 系列
     #   link: /rust/
     - theme: alt
-      text: Rust 学习笔记
-      link: /rust-study-note/
+      text: 学习笔记
+      link: /study-note/
     - theme: alt
       text: Rust For ESP 系列
       link: https://github.com/danclive/esp-examples
