@@ -2,7 +2,7 @@
 
 systemd 是现代 Linux 系统中的初始化系统和系统管理器，它提供了全面的解决方案来管理系统启动和关机过程。通过配置 systemd 服务单元，我们可以轻松设置开机和关机时执行的任务。
 
-## 1. 开机任务
+## 开机任务
 
 systemd 使用"单元（Unit）"的概念来管理系统资源和服务。对于开机任务，我们主要关注 service 类型的单元。
 
@@ -29,48 +29,23 @@ sudo nano /etc/systemd/system/my-startup-task.service
 
 ```ini
 [Unit]
-Description=My Custom Startup Task
-Documentation=https://example.com/documentation
-# 确保在基本系统启动后运行
+Description=my-startup-task
 After=basic.target
-# 依赖 basic.target 但不强制要求成功
-Wants=basic.target
-# 如果需要网络连接，可以改为
-# After=network.target
-# Wants=network.target
+Requires=basic.target
 
 [Service]
-# 服务类型：一次性执行
 Type=oneshot
-# 重启策略：不自动重启
-Restart=no
-# 启动超时时间（秒）
-TimeoutStartSec=30
-# 可以设置工作目录
-WorkingDirectory=/tmp
-# 设置环境变量
-Environment="VARIABLE1=value1" "VARIABLE2=value2"
-# 可以指定用户和组
-User=root
-Group=root
-# 启动前执行的命令
-ExecStartPre=/bin/mkdir -p /var/log/my-task
-# 主要启动命令
-ExecStart=/path/to/your/script.sh
-# 或者直接执行命令
-# ExecStart=/bin/bash -c "echo 'System started at $(date)' >> /var/log/boot-log.txt"
-# 启动后执行的命令
-ExecStartPost=/bin/chmod 644 /var/log/boot-log.txt
+ExecStart=/usr/local/bin/startup-task.sh
+RemainAfterExit=yes
 
 [Install]
-# 定义何时启动该服务
 WantedBy=basic.target
 ```
 
 3. 创建执行脚本（如果使用脚本）：
 
 ```bash
-sudo nano /path/to/your/script.sh
+sudo nano /usr/local/bin/startup-task.sh
 ```
 
 脚本内容示例：
@@ -82,12 +57,12 @@ echo "System started at $(date)" >> /var/log/boot-log.txt
 
 # 执行一些启动任务
 # 例如：清理临时文件
-find /tmp -type f -atime +7 -delete
+# find /tmp -type f -atime +7 -delete
 
 # 检查并挂载某些文件系统
-if ! grep -qs '/mnt/data' /proc/mounts; then
-    mount /mnt/data
-fi
+# if ! grep -qs '/mnt/data' /proc/mounts; then
+#     mount /mnt/data
+# fi
 
 # 启动某些应用程序
 # su - username -c "cd /path/to/app && ./start.sh"
@@ -98,7 +73,7 @@ exit 0
 4. 设置脚本权限：
 
 ```bash
-sudo chmod +x /path/to/your/script.sh
+sudo chmod +x /usr/local/bin/startup-task.sh
 ```
 
 5. 启用并测试服务：
@@ -116,61 +91,6 @@ sudo systemctl start my-startup-task.service
 # 检查服务状态
 sudo systemctl status my-startup-task.service
 ```
-
-### service 文件的关键配置说明
-
-service 文件通常包含三个主要部分：`[Unit]`、`[Service]` 和 `[Install]`。每个部分包含多个配置项，下面详细解释：
-
-#### [Unit] 部分
-
-- **Description**：服务的简短描述，显示在 systemctl status 命令输出中
-- **Documentation**：指向文档的 URL 或路径，方便管理员查阅
-- **After**：指定本服务在哪些单元之后启动，确保依赖的服务先启动完成
-  - 例：`After=network.target syslog.target`
-- **Before**：指定哪些单元应该在本服务之后启动
-- **Wants**：表示弱依赖关系，如果指定的单元启动失败，本服务仍会启动
-- **Requires**：表示强依赖关系，如果指定的单元启动失败，本服务不会启动
-- **Conflicts**：指定与本服务冲突的单元，如果这些单元正在运行，本服务将不会启动
-- **ConditionPathExists**：只有当指定路径存在时才启动服务
-  - 例：`ConditionPathExists=/opt/application`
-- **ConditionPathIsDirectory**：只有当指定路径是目录时才启动服务
-- **ConditionFileNotEmpty**：只有当指定文件不为空时才启动服务
-
-#### [Service] 部分
-
-- **Type**：定义服务的启动类型，影响 systemd 如何判断服务已成功启动
-  - `simple`（默认）：主进程启动后立即视为服务启动完成
-  - `oneshot`：执行一次性命令，完成后退出，适合启动脚本类任务
-  - `forking`：服务使用 fork() 创建子进程后退出，子进程成为主进程，适合传统守护进程
-  - `dbus`：服务通过 D-Bus 通知系统已就绪
-  - `notify`：服务通过 sd_notify() 函数通知系统已就绪
-  - `idle`：类似 simple，但会等到其他作业完成后才启动
-- **ExecStart**：启动服务时执行的命令，必须是绝对路径
-- **ExecStartPre**：在 ExecStart 之前执行的命令，可以有多行
-- **ExecStartPost**：在 ExecStart 之后执行的命令，可以有多行
-- **ExecStop**：停止服务时执行的命令
-- **ExecReload**：重新加载服务时执行的命令
-- **Restart**：定义服务退出后是否自动重启
-  - 选项：`no`, `on-success`, `on-failure`, `on-abnormal`, `on-abort`, `on-watchdog`, `always`
-- **RestartSec**：重启前等待的秒数
-- **TimeoutStartSec**：启动超时时间，超过此时间未启动完成则视为失败
-- **TimeoutStopSec**：停止超时时间，超过此时间未停止则会强制终止
-- **User/Group**：指定运行服务的用户和组
-- **WorkingDirectory**：指定工作目录
-- **Environment**：设置环境变量
-- **EnvironmentFile**：从文件中读取环境变量
-- **Nice**：设置进程优先级，值范围 -20（最高）到 19（最低）
-- **OOMScoreAdjust**：调整 OOM killer 评分，范围 -1000 到 1000
-- **LimitNOFILE**：限制打开文件描述符数量
-- **PrivateTmp**：是否使用私有的 /tmp 目录，增加安全性
-
-#### [Install] 部分
-
-- **WantedBy**：定义服务应该在哪个 target 启动时启动，最常用
-  - 例：`WantedBy=multi-user.target`
-- **RequiredBy**：定义哪些 target 强依赖本服务
-- **Also**：指定当启用本服务时，同时启用哪些其他单元
-- **Alias**：为服务创建别名
 
 ### 对比不同启动阶段的详细介绍
 
@@ -248,7 +168,7 @@ systemd 采用"目标（target）"的概念代替了传统的运行级别。不�
 systemctl list-dependencies multi-user.target
 ```
 
-## 2. 关机任务
+## 关机任务
 
 与启动任务类似，systemd 也允许我们在系统关机时执行特定任务，例如备份数据、清理缓存或发送通知等。
 
@@ -264,50 +184,23 @@ sudo nano /etc/systemd/system/my-shutdown-task.service
 
 ```ini
 [Unit]
-Description=My Custom Shutdown Task
-Documentation=https://example.com/documentation
-# 禁用默认依赖关系，这对于关机服务非常重要，否则服务可能在依赖关系处理过程中被过早终止
+Description=my-shutdown-task
 DefaultDependencies=no
-# 确保在关机前执行
-Before=shutdown.target reboot.target halt.target
-# 如果需要在数据库等服务关闭前执行，可以添加
-# After=mysqld.service postgresql.service
-# 确保挂载点仍然可用
-Requires=-.mount
-After=-.mount
-# 冲突设置，确保不会在系统启动时执行
-Conflicts=reboot.target
+Before=shutdown.target
 
 [Service]
-# 服务类型：一次性执行
 Type=oneshot
-# 关机任务通常使用 ExecStop 执行
-ExecStart=/bin/true
-# 这是关键：在系统关闭时执行的实际命令
-ExecStop=/path/to/your/shutdown-script.sh
-# 或者直接执行命令
-# ExecStop=/bin/bash -c "echo 'System shutting down at $(date)' >> /var/log/shutdown-log.txt"
-# 这个设置是关键，即使 ExecStart 执行完毕，服务也视为活动状态，确保 ExecStop 可以被调用
+ExecStart=/usr/local/bin/shutdown_task.sh
 RemainAfterExit=yes
-# 设置超时时间，防止关机过程被过长的关机脚本延迟
-TimeoutStopSec=120
-# 可以指定用户和组
-User=root
-Group=root
-# 可以设置工作目录
-WorkingDirectory=/var/log
-# 设置环境变量
-Environment="SHUTDOWN_TYPE=normal" "LOG_LEVEL=info"
 
 [Install]
-# 将服务关联到关机目标
 WantedBy=shutdown.target
 ```
 
 3. 创建关机脚本：
 
 ```bash
-sudo nano /path/to/your/shutdown-script.sh
+sudo nano /usr/local/bin/shutdown_task.sh
 ```
 
 脚本内容示例：
@@ -316,33 +209,12 @@ sudo nano /path/to/your/shutdown-script.sh
 #!/bin/bash
 # 记录关机时间
 echo "System shutting down at $(date)" >> /var/log/shutdown-log.txt
-
-# 执行数据备份
-BACKUP_DIR="/var/backups/$(date +%Y%m%d)"
-mkdir -p $BACKUP_DIR
-mysqldump --all-databases > "$BACKUP_DIR/all-databases.sql" 2>/dev/null || true
-
-# 同步未写入的文件系统数据
-sync
-
-# 清理临时文件
-find /tmp -type f -delete 2>/dev/null || true
-
-# 发送关机通知
-if command -v mail &>/dev/null; then
-    echo "System $(hostname) is shutting down at $(date)" | mail -s "System shutdown" admin@example.com
-fi
-
-# 记录服务状态
-systemctl list-units --state=running --no-pager > "$BACKUP_DIR/running-services.txt" 2>/dev/null || true
-
-exit 0
 ```
 
 4. 设置脚本权限：
 
 ```bash
-sudo chmod +x /path/to/your/shutdown-script.sh
+sudo chmod +x /usr/local/bin/shutdown_task.sh
 ```
 
 5. 启用并测试服务：
@@ -361,47 +233,8 @@ sudo systemctl start my-shutdown-task.service
 sudo systemctl status my-shutdown-task.service
 
 # 模拟测试关机脚本（不实际关机）
-sudo /path/to/your/shutdown-script.sh
+sudo /usr/local/bin/shutdown_task.sh
 ```
-
-### service 文件的关键配置详解
-
-关机任务的 service 文件配置与普通服务有一些重要区别：
-
-#### DefaultDependencies=no
-- **重要性**：对关机服务至关重要
-- **作用**：防止 systemd 自动添加默认依赖关系
-- **原因**：默认依赖会导致服务在关机过程中的依赖处理中被过早关闭，可能导致关机脚本无法执行
-
-#### Before=shutdown.target
-- **重要性**：确保顺序正确
-- **作用**：指定本服务必须在 shutdown.target 激活前完成
-- **相关场景**：可以添加多个 Before 指令，确保在多种关机场景下都能执行
-  - `Before=shutdown.target reboot.target halt.target poweroff.target`
-
-#### RemainAfterExit=yes
-- **重要性**：关键配置，不可省略
-- **作用**：即使 ExecStart 命令执行完成，服务也被视为"活动"状态
-- **原因**：只有处于活动状态的服务，其 ExecStop 命令才会在系统关机时执行
-
-#### ExecStart=/bin/true
-- **用途**：提供一个简单的、总是成功的启动命令
-- **作用**：确保服务能成功启动并保持活动状态
-- **替代方案**：可以在此处放置一些系统启动时的初始化命令
-
-#### ExecStop
-- **重要性**：真正执行关机任务的命令
-- **执行时机**：当系统关机或服务停止时执行
-- **注意事项**：
-  - 应设置合理的超时时间（TimeoutStopSec）
-  - 脚本应处理异常情况并及时退出
-  - 避免执行可能卡住的操作
-
-#### WantedBy=shutdown.target
-- **作用**：指定当系统关机时，此服务应被激活
-- **替代选项**：
-  - `WantedBy=reboot.target`：仅在重启时激活
-  - `WantedBy=poweroff.target`：仅在关机时激活
 
 ### 关机相关 target 详细介绍
 
@@ -485,47 +318,88 @@ systemctl list-dependencies shutdown.target
 systemctl list-dependencies --reverse shutdown.target
 ```
 
-## 应用场景示例
+## service 文件的关键配置说明
+
+service 文件通常包含三个主要部分：`[Unit]`、`[Service]` 和 `[Install]`。每个部分包含多个配置项，下面详细解释：
+
+#### [Unit] 部分
+
+- **Description**：服务的简短描述，显示在 systemctl status 命令输出中
+- **Documentation**：指向文档的 URL 或路径，方便管理员查阅
+- **After**：指定本服务在哪些单元之后启动，确保依赖的服务先启动完成
+  - 例：`After=network.target syslog.target`
+- **Before**：指定哪些单元应该在本服务之后启动
+- **Wants**：表示弱依赖关系，如果指定的单元启动失败，本服务仍会启动
+- **Requires**：表示强依赖关系，如果指定的单元启动失败，本服务不会启动
+- **Conflicts**：指定与本服务冲突的单元，如果这些单元正在运行，本服务将不会启动
+- **ConditionPathExists**：只有当指定路径存在时才启动服务
+  - 例：`ConditionPathExists=/opt/application`
+- **ConditionPathIsDirectory**：只有当指定路径是目录时才启动服务
+- **ConditionFileNotEmpty**：只有当指定文件不为空时才启动服务
+
+#### [Service] 部分
+
+- **Type**：定义服务的启动类型，影响 systemd 如何判断服务已成功启动
+  - `simple`（默认）：主进程启动后立即视为服务启动完成
+  - `oneshot`：执行一次性命令，完成后退出，适合启动脚本类任务
+  - `forking`：服务使用 fork() 创建子进程后退出，子进程成为主进程，适合传统守护进程
+  - `dbus`：服务通过 D-Bus 通知系统已就绪
+  - `notify`：服务通过 sd_notify() 函数通知系统已就绪
+  - `idle`：类似 simple，但会等到其他作业完成后才启动
+- **ExecStart**：启动服务时执行的命令，必须是绝对路径
+- **ExecStartPre**：在 ExecStart 之前执行的命令，可以有多行
+- **ExecStartPost**：在 ExecStart 之后执行的命令，可以有多行
+- **ExecStop**：停止服务时执行的命令
+- **ExecReload**：重新加载服务时执行的命令
+- **Restart**：定义服务退出后是否自动重启
+  - 选项：`no`, `on-success`, `on-failure`, `on-abnormal`, `on-abort`, `on-watchdog`, `always`
+- **RestartSec**：重启前等待的秒数
+- **TimeoutStartSec**：启动超时时间，超过此时间未启动完成则视为失败
+- **TimeoutStopSec**：停止超时时间，超过此时间未停止则会强制终止
+- **User/Group**：指定运行服务的用户和组
+  - 例：`User=root Group=root`
+- **WorkingDirectory**：指定工作目录
+  - 例：`WorkingDirectory=/path/to/app`
+- **Environment**：设置环境变量
+  - 例：`Environment="VARIABLE1=value1" "VARIABLE2=value2"`
+- **EnvironmentFile**：从文件中读取环境变量
+  - 例：`EnvironmentFile=/etc/sysconfig/myapp`
+- **Nice**：设置进程优先级，值范围 -20（最高）到 19（最低）
+- **OOMScoreAdjust**：调整 OOM killer 评分，范围 -1000 到 1000
+- **LimitNOFILE**：限制打开文件描述符数量
+- **PrivateTmp**：是否使用私有的 /tmp 目录，增加安全性
+
+#### [Install] 部分
+
+- **WantedBy**：定义服务应该在哪个 target 启动时启动，最常用
+  - 例：`WantedBy=multi-user.target`
+- **RequiredBy**：定义哪些 target 强依赖本服务
+- **Also**：指定当启用本服务时，同时启用哪些其他单元
+- **Alias**：为服务创建别名
+
+## 更多应用场景示例
 
 ### 1. 创建一个网络可用后执行的开机任务
 
 ```ini
 [Unit]
-Description=Service that runs after network is online
-After=network-online.target
-Wants=network-online.target
+Description=frp client
+After=network.target
+Wants=network.target
 
 [Service]
-Type=oneshot
-ExecStart=/usr/local/bin/network-dependent-script.sh
-TimeoutStartSec=0
+Type=simple
+WorkingDirectory=/path/to/frp
+ExecStart=/path/to/frp/frpc -c frpc.toml
+Restart=always
+RestartSec=5s
+
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-### 2. 创建一个数据库备份的关机任务
-
-```ini
-[Unit]
-Description=Backup databases before shutdown
-DefaultDependencies=no
-After=mysqld.service postgresql.service
-Before=shutdown.target
-Conflicts=reboot.target
-
-[Service]
-Type=oneshot
-ExecStart=/bin/true
-ExecStop=/usr/local/bin/backup-databases.sh
-RemainAfterExit=yes
-TimeoutStopSec=120
-
-[Install]
-WantedBy=shutdown.target
-```
-
-### 3. 创建一个条件性启动的服务
+### 2. 创建一个条件性启动的服务
 
 ```ini
 [Unit]
@@ -593,20 +467,36 @@ sudo journalctl -b -1 -o short-precise  # 查看上一次启动的日志
 
 有了这些知识，你可以灵活地配置各种系统任务，提高系统的自动化程度和可维护性。
 
+## 有用的命令速查
+
 ```bash
-# 有用的命令速查
 # 列出所有活动的 target
 systemctl list-units --type=target
 
-# 查看默认 target
-systemctl get-default
-
-# 切换运行级别
-systemctl isolate multi-user.target
-
-# 设置默认运行级别
-systemctl set-default multi-user.target
-
 # 分析启动时间
 systemd-analyze blame
+
+# 查看服务依赖关系
+systemctl list-dependencies my-service
+
+# 查看服务状态
+systemctl status my-service
+
+# 查看服务日志
+journalctl -u my-service
+
+# 查看服务单元文件
+systemctl show my-service
+
+# 禁用某个服务
+systemctl disable my-service
+
+# 启用某个服务
+systemctl enable my-service
+
+# 屏蔽某个服务
+systemctl mask my-service
+
+# 取消屏蔽某个服务
+systemctl unmask my-service
 ```
