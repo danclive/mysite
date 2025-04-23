@@ -96,7 +96,6 @@ sudo nano /etc/wireguard/wg0.conf
 [Interface]
 PrivateKey = <Client1私钥>
 Address = 10.0.0.2/24
-DNS = 8.8.8.8
 
 [Peer]
 PublicKey = <服务器公钥>
@@ -133,7 +132,6 @@ sudo nano /etc/wireguard/wg0.conf
 [Interface]
 PrivateKey = <Client2私钥>
 Address = 10.0.0.3/24
-DNS = 8.8.8.8
 
 [Peer]
 PublicKey = <服务器公钥>
@@ -271,6 +269,16 @@ PersistentKeepalive = 25
 - 通过这个设置，客户端所有的网络流量都会通过WireGuard隧道转发到服务器，再由服务器转发到目标地址
 
 > **注意**：启用全局流量转发后，客户端的所有网络活动都将通过VPN服务器，这可能会影响网络性能。确保服务器有足够的带宽和处理能力来处理增加的流量。
+
+## DNS配置说明
+
+WireGuard配置中的DNS设置会直接影响客户端的DNS解析行为：
+
+1. **仅转发WireGuard网络内流量时**：如果你只希望通过WireGuard转发特定网段（如10.0.0.0/24）的流量，建议**不设置DNS**，这样可以保持本地网络的DNS正常工作，避免systemd-resolved出现异常。
+
+2. **全局转发流量时**：如果设置了`AllowedIPs = 0.0.0.0/0, ::/0`进行全局流量转发，此时通常**需要设置DNS**（如`DNS = 8.8.8.8`），确保所有DNS查询也通过VPN隧道，防止DNS泄漏，增强隐私保护。
+
+可以根据自己的使用需求选择是否配置DNS。
 
 ## 故障排除
 
