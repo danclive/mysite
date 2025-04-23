@@ -32,9 +32,7 @@ sudo apt install wireguard
 1. 生成服务器密钥对：
 
 ```bash
-cd /etc/wireguard
-sudo umask 077
-sudo wg genkey | sudo tee privatekey | sudo wg pubkey > publickey
+wg genkey | tee privatekey | wg pubkey > publickey
 ```
 
 2. 创建服务器配置文件 `/etc/wireguard/wg0.conf`：
@@ -79,9 +77,7 @@ AllowedIPs = 10.0.0.3/32
 1. 生成客户端密钥对：
 
 ```bash
-cd /etc/wireguard
-sudo umask 077
-sudo wg genkey | sudo tee privatekey | sudo wg pubkey > publickey
+wg genkey | tee privatekey | wg pubkey > publickey
 ```
 
 2. 创建客户端配置文件 `/etc/wireguard/wg0.conf`：
