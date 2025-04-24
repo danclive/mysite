@@ -25,6 +25,12 @@ sudo apt update
 sudo apt install wireguard
 ```
 
+确认是否支持 wireguard 模块：
+
+```bash
+modinfo wireguard
+```
+
 ## 基本配置
 
 ### 服务器配置
