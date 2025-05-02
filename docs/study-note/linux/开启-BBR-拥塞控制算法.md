@@ -51,13 +51,13 @@ modprobe tcp_bbr
 
 ### 2. 设置BBR为默认拥塞控制算法
 ```bash
-echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.d/10-bbr.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.d/10-bbr.conf
 ```
 
 ### 3. 应用配置
 ```bash
-sysctl -p
+sysctl -p /etc/sysctl.d/10-bbr.conf
 ```
 
 ### 4. 验证是否生效
@@ -105,13 +105,13 @@ echo "正在启用BBR..."
 {
     echo "net.core.default_qdisc=fq"
     echo "net.ipv4.tcp_congestion_control=bbr"
-} >> /etc/sysctl.conf
+} >> /etc/sysctl.d/10-bbr.conf
 
 # 加载模块
 modprobe tcp_bbr
 
 # 应用设置
-sysctl -p >/dev/null 2>&1
+sysctl -p /etc/sysctl.d/10-bbr.conf >/dev/null 2>&1
 
 # 验证
 NEW_CC=$(sysctl -n net.ipv4.tcp_congestion_control)
