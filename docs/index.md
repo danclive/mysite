@@ -11,8 +11,8 @@ hero:
     #   text: Rust 系列
     #   link: /rust/
     - theme: alt
-      text: 学习笔记
-      link: /study-note/
+      text: 笔记
+      link: /note/
     - theme: alt
       text: Rust For ESP 系列
       link: https://github.com/danclive/esp-examples
